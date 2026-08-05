@@ -11,7 +11,7 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-black/10 backdrop-blur-md border-b border-white/5 z-50">
-      <div className="container mx-auto px-5 py-4 flex flex-col md:flex-row gap-4 md:gap-0 items-center justify-between">
+      <div className="container mx-auto px-5 py-4 flex gap-4 md:gap-0 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <div
             className="

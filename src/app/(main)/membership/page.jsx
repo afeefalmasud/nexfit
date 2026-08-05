@@ -113,7 +113,7 @@ export default function MembershipPage() {
                   <ul className="space-y-3.5 pt-6 border-t border-white/5 text-xs sm:text-sm text-[#9CA3AF]">
                     {plan.features.map((feature, fIdx) => (
                       <li key={fIdx} className="flex items-center gap-3">
-                        <FiCheck className="w-4 h-4 text-[#f97316] shrink-0 stroke-[3]" />
+                        <FiCheck className="w-4 h-4 text-[#f97316] shrink-0 stroke-3" />
                         <span>{feature}</span>
                       </li>
                     ))}
