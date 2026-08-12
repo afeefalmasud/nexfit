@@ -1,14 +1,23 @@
 'use client'
 import Link from 'next/link';
-import { FaFire } from 'react-icons/fa'
+import { FaFire } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { FiUser, FiSliders, FiShield } from 'react-icons/fi';
 import { authClient } from "@/lib/auth-client";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { redirect } from "next/navigation";
 
 const SignInForm = () => {
+  const [role, setRole] = useState("member"); // 'member', 'trainer', or 'admin'
+
+  const handleGoogleSignIn = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/dashboard",
+    });
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
 
@@ -18,40 +27,41 @@ const SignInForm = () => {
     const { data, error } = await authClient.signIn.email({
       email: userData.email,
       password: userData.password,
+      role: userData.role, // Passes selected role
     });
-    if(data){
-      redirect('/')
-    }
+
     if (error) {
-      toast.error("Invalid email or password", {
+      toast.error(error.message || "Invalid email or password", {
         position: "top-center",
         theme: "dark",
         autoClose: 1500,
         transition: Bounce,
       });
-    } else {
+      return;
+    }
+
+    if (data) {
       toast.success("Welcome back!", {
         position: "top-center",
         theme: "dark",
         autoClose: 1500,
         transition: Bounce,
       });
+      redirect('/');
     }
   };
 
   return (
     <div className="min-h-screen w-full bg-[#0A0706] text-white flex font-sans">
 
+      {/* Left Banner */}
       <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-end p-12 overflow-hidden bg-[#120D0B] border-r border-white/5">
-        
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
           style={{ backgroundImage: `url('/assets/signIn.jpg')` }} 
         />
-
         <div className="absolute inset-0 bg-linear-to-t from-[#0A0706] via-[#0A0706]/40 to-transparent" />
         <div className="absolute inset-0 bg-linear-to-r from-transparent to-[#0A0706]/80" />
-
         <div className="absolute top-1/3 left-1/3 w-80 h-80 bg-[#f97316]/15 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="relative z-10 space-y-2">
@@ -64,8 +74,9 @@ const SignInForm = () => {
         </div>
       </div>
 
+      {/* Form Area */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-full max-w-md space-y-7">
 
           <div className="space-y-4">
             <Link href="/" className="inline-flex items-center gap-2.5 group">
@@ -82,12 +93,45 @@ const SignInForm = () => {
                 WELCOME BACK
               </h1>
               <p className="text-xs text-[#9CA3AF]">
-                Log in to book classes, track progress and join the conversation.
+                Select your role and sign in to access your dashboard.
               </p>
             </div>
           </div>
 
           <form onSubmit={onSubmit} className="space-y-4">
+            {/* Hidden Input to send selected Role in FormData */}
+            <input type="hidden" name="role" value={role} />
+
+            {/* Role Selection */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-[#9CA3AF]">
+                Sign In As
+              </label>
+              <div className="grid grid-cols-3 gap-2.5">
+                {[
+                  { id: 'member', label: 'MEMBER', Icon: FiUser },
+                  { id: 'trainer', label: 'TRAINER', Icon: FiSliders },
+                  { id: 'admin', label: 'ADMIN', Icon: FiShield },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setRole(item.id)}
+                    className={`flex flex-col items-center justify-center py-3 rounded-xl border transition-all cursor-pointer active:scale-95 ${
+                      role === item.id
+                        ? "bg-[#f97316]/10 border-[#f97316] text-[#f97316] shadow-[0_0_15px_rgba(249,115,22,0.2)]"
+                        : "bg-[#140F0D] border-white/10 text-[#9CA3AF] hover:border-white/20"
+                    }`}
+                  >
+                    <item.Icon className="w-4 h-4 mb-1" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">
+                      {item.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-[#9CA3AF]">
                 Email
@@ -118,7 +162,7 @@ const SignInForm = () => {
               type="submit"
               className="w-full py-3.5 rounded-xl bg-[#f97316] text-black font-extrabold text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(249,115,22,0.35)] hover:bg-[#ea580c] active:scale-95 transition-all duration-150 cursor-pointer pt-3"
             >
-              LOG IN
+              LOG IN AS {role.toUpperCase()}
             </button>
           </form>
 
@@ -131,41 +175,12 @@ const SignInForm = () => {
 
           <button
             type="button"
+            onClick={handleGoogleSignIn}
             className="w-full py-3 rounded-xl bg-[#140F0D] border border-white/10 text-xs font-semibold text-white flex items-center justify-center gap-3 hover:bg-white/5 active:scale-95 transition-all duration-150 cursor-pointer"
           >
             <FcGoogle className="w-4 h-4" />
             Continue with Google
           </button>
-
-          <div className="rounded-2xl bg-[#140F0D] border border-white/5 p-5 space-y-4">
-            <div className="space-y-1">
-              <span className="text-[#f97316] text-[10px] font-extrabold tracking-[0.2em] uppercase">
-                DEMO INTERFACES
-              </span>
-              <p className="text-[11px] text-[#9CA3AF]">
-                This is a design preview — pick a role to explore its dashboard.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2.5">
-              {[
-                { label: 'MEMBER', Icon: FiUser },
-                { label: 'TRAINER', Icon: FiSliders },
-                { label: 'ADMIN', Icon: FiShield },
-              ].map((role) => (
-                <button
-                  key={role.label}
-                  type="button"
-                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-[#1C1613] border border-white/5 hover:border-[#f97316]/40 hover:text-[#f97316] active:scale-95 transition-all duration-150 cursor-pointer text-[#9CA3AF]"
-                >
-                  <role.Icon className="w-4 h-4 mb-1" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider">
-                    {role.label}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
 
           <p className="text-center text-xs text-[#9CA3AF]">
             New to NexFit?{' '}
@@ -182,7 +197,7 @@ const SignInForm = () => {
       <ToastContainer />
     </div>
   );
-}
+};
 
 export default function SignInPage() {
   return (
