@@ -1,8 +1,12 @@
 'use client'
 
+import { addClass } from '@/lib/actions/addclass';
+import { useSession } from '@/lib/auth-client';
 import { useState } from 'react';
 
 export default function AddClass() {
+  const { data: session } = useSession();
+  const user = session?.user;
   const [formData, setFormData] = useState({
     className: '',
     coverImage: '',
@@ -28,23 +32,33 @@ export default function AddClass() {
     setStatusMessage({ type: '', text: '' });
 
     try {
-      // Replace with your API submission logic
-      // await fetch('/api/classes', { method: 'POST', body: JSON.stringify(formData) });
-      
-      setStatusMessage({
-        type: 'success',
-        text: 'Class submitted successfully! Pending admin approval.',
-      });
-      setFormData({
-        className: '',
-        coverImage: '',
-        category: '',
-        difficulty: '',
-        duration: '',
-        price: '',
-        schedule: '',
-        description: '',
-      });
+      const payload = {
+        ...formData,
+        trainerId: user?.id, // Unique ID per user
+        trainerEmail: user?.email,
+        status: 'approved', // Direct approval until admin functionality is built
+      };
+
+      const res = await addClass(payload);
+
+      if (res?.insertedId) {
+        setStatusMessage({
+          type: 'success',
+          text: 'Class added and published directly to your dashboard!',
+        });
+        setFormData({
+          className: '',
+          coverImage: '',
+          category: '',
+          difficulty: '',
+          duration: '',
+          price: '',
+          schedule: '',
+          description: '',
+        });
+      } else {
+        throw new Error('Insert failed');
+      }
     } catch (error) {
       setStatusMessage({
         type: 'error',
@@ -57,7 +71,6 @@ export default function AddClass() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Header Info */}
       <div className="space-y-1">
         <span className="text-[#f97316] text-[10px] font-extrabold tracking-[0.2em] uppercase">
           COACHING
@@ -65,15 +78,10 @@ export default function AddClass() {
         <h1 className="text-3xl font-extrabold uppercase tracking-tight text-white">
           ADD A CLASS
         </h1>
-        <p className="text-xs text-[#9CA3AF]">
-          New classes are submitted with a Pending status and go live once an admin approves them.
-        </p>
       </div>
 
-      {/* Form Container */}
       <div className="bg-[#120c09] border border-white/5 rounded-2xl p-6 md:p-8 max-w-2xl">
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Status Alert Message */}
           {statusMessage.text && (
             <div
               className={`p-3.5 rounded-xl text-xs font-semibold ${
@@ -86,7 +94,6 @@ export default function AddClass() {
             </div>
           )}
 
-          {/* Class Name */}
           <div className="space-y-1.5">
             <label className="block text-xs font-bold text-white uppercase tracking-tight">
               Class name
@@ -102,7 +109,6 @@ export default function AddClass() {
             />
           </div>
 
-          {/* Cover Image URL */}
           <div className="space-y-1.5">
             <label className="block text-xs font-bold text-white uppercase tracking-tight">
               Cover image URL
@@ -118,7 +124,6 @@ export default function AddClass() {
             />
           </div>
 
-          {/* Category & Difficulty */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-white uppercase tracking-tight">
@@ -164,7 +169,6 @@ export default function AddClass() {
             </div>
           </div>
 
-          {/* Duration & Price */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-white uppercase tracking-tight">
@@ -197,7 +201,6 @@ export default function AddClass() {
             </div>
           </div>
 
-          {/* Schedule */}
           <div className="space-y-1.5">
             <label className="block text-xs font-bold text-white uppercase tracking-tight">
               Schedule (days & time)
@@ -213,7 +216,6 @@ export default function AddClass() {
             />
           </div>
 
-          {/* Description */}
           <div className="space-y-1.5">
             <label className="block text-xs font-bold text-white uppercase tracking-tight">
               Description
@@ -229,7 +231,6 @@ export default function AddClass() {
             />
           </div>
 
-          {/* Submit Button */}
           <div className="pt-2">
             <button
               type="submit"

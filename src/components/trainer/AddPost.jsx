@@ -1,70 +1,25 @@
-'use client'
+'use client';
 
-import { useState, useRef } from 'react';
-import { FiImage, FiX } from 'react-icons/fi';
+import { addForum } from '@/lib/actions/addforum';
+import { useSession } from '@/lib/auth-client';
+import { useState } from 'react';
 
 export default function AddForumPost() {
+  const { data: session } = useSession();
+  const user = session?.user;
+
   const [formData, setFormData] = useState({
     title: '',
-    coverImage: null,
-    imagePreview: '',
+    coverImage: '',
     description: '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef(null);
 
-  const handleTitleChange = (e) => {
-    setFormData((prev) => ({ ...prev, title: e.target.value }));
-  };
-
-  const handleDescriptionChange = (e) => {
-    setFormData((prev) => ({ ...prev, description: e.target.value }));
-  };
-
-  // Image Upload Handlers
-  const handleFileSelect = (file) => {
-    if (file && file.type.startsWith('image/')) {
-      const previewUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({
-        ...prev,
-        coverImage: file,
-        imagePreview: previewUrl,
-      }));
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileSelect(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    if (formData.imagePreview) {
-      URL.revokeObjectURL(formData.imagePreview);
-    }
-    setFormData((prev) => ({
-      ...prev,
-      coverImage: null,
-      imagePreview: '',
-    }));
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -73,26 +28,30 @@ export default function AddForumPost() {
     setStatusMessage({ type: '', text: '' });
 
     try {
-      // Replace with your API route call (e.g., FormData upload to Next.js API endpoint)
-      // const body = new FormData();
-      // body.append('title', formData.title);
-      // body.append('description', formData.description);
-      // if (formData.coverImage) body.append('coverImage', formData.coverImage);
-      // await fetch('/api/forum', { method: 'POST', body });
+      const payload = {
+        title: formData.title,
+        coverImage: formData.coverImage,
+        description: formData.description,
+        trainerId: user?.id,
+        trainerEmail: user?.email,
+        status: 'approved',
+      };
 
-      setStatusMessage({
-        type: 'success',
-        text: 'Post published successfully to the forum!',
-      });
+      const res = await addForum(payload);
 
-      // Clear Form
-      handleRemoveImage();
-      setFormData({
-        title: '',
-        coverImage: null,
-        imagePreview: '',
-        description: '',
-      });
+      if (res?.insertedId) {
+        setStatusMessage({
+          type: 'success',
+          text: 'Post published successfully to the forum!',
+        });
+        setFormData({
+          title: '',
+          coverImage: '',
+          description: '',
+        });
+      } else {
+        throw new Error('Insert failed');
+      }
     } catch (error) {
       setStatusMessage({
         type: 'error',
@@ -141,64 +100,44 @@ export default function AddForumPost() {
             </label>
             <input
               type="text"
+              name="title"
               value={formData.title}
-              onChange={handleTitleChange}
+              onChange={handleChange}
               placeholder="Progressive overload without burning out"
               required
               className="w-full bg-[#1b120c]/60 border border-white/5 rounded-xl px-4 py-3 text-xs text-white placeholder-[#9CA3AF]/40 focus:outline-none focus:border-[#f97316]/50 transition-colors"
             />
           </div>
 
-          {/* Cover Image Drag & Drop Area */}
+          {/* Cover Image URL Input */}
           <div className="space-y-1.5">
             <label className="block text-xs font-bold text-white uppercase tracking-tight">
-              Cover image
+              Cover Image URL
             </label>
-
             <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
+              type="url"
+              name="coverImage"
+              value={formData.coverImage}
+              onChange={handleChange}
+              placeholder="https://images.unsplash.com/photo-..."
+              required
+              className="w-full bg-[#1b120c]/60 border border-white/5 rounded-xl px-4 py-3 text-xs text-white placeholder-[#9CA3AF]/40 focus:outline-none focus:border-[#f97316]/50 transition-colors"
             />
-
-            {!formData.imagePreview ? (
-              <div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                className={`border border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all ${
-                  isDragging
-                    ? 'border-[#f97316] bg-[#f97316]/10'
-                    : 'border-white/10 bg-[#1b120c]/40 hover:bg-[#1b120c]/70 hover:border-white/20'
-                }`}
-              >
-                <div className="p-2.5 rounded-xl bg-white/5 text-[#f97316]">
-                  <FiImage className="w-5 h-5" />
-                </div>
-                <p className="text-xs text-[#9CA3AF] text-center font-medium">
-                  Drop an image here or <span className="text-white underline">click to upload</span>
-                </p>
-              </div>
-            ) : (
-              <div className="relative rounded-2xl overflow-hidden border border-white/10 h-44 group bg-[#1b120c]">
-                <img
-                  src={formData.imagePreview}
-                  alt="Cover preview"
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={handleRemoveImage}
-                  className="absolute top-3 right-3 p-1.5 rounded-lg bg-black/60 text-white hover:bg-black/90 transition-colors cursor-pointer"
-                >
-                  <FiX className="w-4 h-4" />
-                </button>
-              </div>
-            )}
           </div>
+
+          {/* Optional Image Preview */}
+          {formData.coverImage && (
+            <div className="relative rounded-2xl overflow-hidden border border-white/10 h-44 bg-[#1b120c]">
+              <img
+                src={formData.coverImage}
+                alt="Cover preview"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+          )}
 
           {/* Description Textarea */}
           <div className="space-y-1.5">
@@ -206,8 +145,9 @@ export default function AddForumPost() {
               Description
             </label>
             <textarea
+              name="description"
               value={formData.description}
-              onChange={handleDescriptionChange}
+              onChange={handleChange}
               rows={6}
               placeholder="Write your post..."
               required

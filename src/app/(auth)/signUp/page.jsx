@@ -3,27 +3,27 @@ import Link from "next/link";
 import { FaFire } from "react-icons/fa";
 import { FiCheck, FiUser, FiSliders } from "react-icons/fi";
 import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { Suspense, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 
 const SignUpForm = () => {
   const [role, setRole] = useState("member"); // 'member' or 'trainer'
-  
+  const router = useRouter();
 
   const onSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
     const userData = Object.fromEntries(formData.entries());
-    
+
     const { data, error } = await authClient.signUp.email({
       name: userData.name,
       email: userData.email,
       password: userData.password,
       image: userData.image,
-      role: userData.role, // Passes 'member' or 'trainer'
+      role: role, // Directly pass selected React state
     });
 
     if (error) {
@@ -43,7 +43,11 @@ const SignUpForm = () => {
         autoClose: 1500,
         transition: Bounce,
       });
-      redirect("/signIn");
+
+      // Use router.push inside client component handlers
+      setTimeout(() => {
+        router.push("/signIn");
+      }, 1000);
     }
   };
 
@@ -72,7 +76,7 @@ const SignUpForm = () => {
           </div>
 
           <form onSubmit={onSubmit} className="space-y-4">
-            {/* Hidden Input to send selected Role in FormData */}
+            {/* Hidden Input as Fallback */}
             <input type="hidden" name="role" value={role} />
 
             {/* Role Selection */}
@@ -159,8 +163,7 @@ const SignUpForm = () => {
                 className="w-full px-4 py-3 rounded-xl bg-[#140F0D] border border-white/10 text-sm text-white placeholder-[#9CA3AF]/40 focus:outline-none focus:border-[#f97316] transition-colors"
               />
               <p className="text-[10px] text-[#9CA3AF]/70 pt-0.5">
-                Minimum 6 characters, with one uppercase and one lowercase
-                letter.
+                Minimum 6 characters, with one uppercase and one lowercase letter.
               </p>
             </div>
 
@@ -170,15 +173,15 @@ const SignUpForm = () => {
             >
               CREATE {role.toUpperCase()} ACCOUNT
             </button>
-              
           </form>
+
           <div className="relative flex items-center justify-center my-6">
             <div className="w-full border-t border-white/10" />
             <span className="absolute bg-[#0A0706] px-3 text-[10px] font-bold text-[#9CA3AF]/60 uppercase tracking-widest">
               OR CONTINUE WITH
             </span>
           </div>
-          
+
           <button
             type="button"
             className="w-full py-3 rounded-xl bg-[#140F0D] border border-white/10 text-xs font-semibold text-white flex items-center justify-center gap-3 hover:bg-white/5 active:scale-95 transition-all duration-150 cursor-pointer"

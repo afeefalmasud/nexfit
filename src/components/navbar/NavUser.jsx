@@ -1,4 +1,5 @@
 "use client";
+
 import { signOut, useSession } from "@/lib/auth-client";
 import { Avatar } from "@heroui/react";
 import Link from "next/link";
@@ -9,7 +10,31 @@ const NavUser = () => {
   const { data, isPending } = useSession();
   const user = data?.user;
   const [isOpen, setIsOpen] = useState(false);
+  const [dbRole, setDbRole] = useState(null); // Stores fetched MongoDB role
   const dropdownRef = useRef(null);
+
+  // Fetch role directly from MongoDB when user logs in
+  useEffect(() => {
+    if (user?.email) {
+      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user?email=${user.email}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.user?.role) {
+            setDbRole(data.user.role);
+          }
+        })
+        .catch((err) => console.error("Failed to fetch user role:", err));
+    }
+  }, [user?.email]);
+
+  // Determine dashboard destination based on fetched DB role
+  const activeRole = dbRole || user?.role || "member";
+  const dashboardHref =
+    activeRole === "trainer"
+      ? "/trainer"
+      : activeRole === "member"
+      ? "/member"
+      : "/admin";
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -22,9 +47,7 @@ const NavUser = () => {
   }, []);
 
   if (isPending) {
-    return (
-      <span className="loading loading-ring loading-lg text-[#f97316]"></span>
-    );
+    return <span className="loading loading-ring loading-lg text-[#f97316]"></span>;
   }
 
   return (
@@ -53,17 +76,13 @@ const NavUser = () => {
             {isOpen && (
               <div className="absolute right-0 mt-3 w-56 rounded-2xl bg-[#140F0D] border border-white/10 shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="px-4 py-3 border-b border-white/5 space-y-0.5">
-                  <p className="text-xs font-bold text-white truncate">
-                    {user?.name}
-                  </p>
-                  <p className="text-[11px] text-[#9CA3AF] truncate">
-                    {user?.email}
-                  </p>
+                  <p className="text-xs font-bold text-white truncate">{user?.name}</p>
+                  <p className="text-[11px] text-[#9CA3AF] truncate">{user?.email}</p>
                 </div>
 
                 <div className="p-1 space-y-1">
                   <Link
-                    href="/dashboard"
+                    href={dashboardHref}
                     onClick={() => setIsOpen(false)}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-white hover:bg-[#f97316]/10 hover:text-[#f97316] transition-colors"
                   >

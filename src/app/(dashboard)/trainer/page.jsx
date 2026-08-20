@@ -11,14 +11,14 @@ import {
   FiFileText, 
   FiArrowLeft, 
   FiLogOut, 
-  FiBell,
   FiUsers,
-  FiStar,
   FiTrendingUp
 } from 'react-icons/fi';
 import { authClient, useSession } from "@/lib/auth-client";
 import AddClass from '@/components/trainer/AddClass';
 import AddForumPost from '@/components/trainer/AddPost';
+import MyClasses from '@/components/trainer/MyClass';
+import ForumPostList from '@/components/trainer/MyForum';
 
 export default function TrainerDashboardPage() {
   // Default tab is 'overview' on reload
@@ -181,7 +181,6 @@ export default function TrainerDashboardPage() {
                   Your classes, enrolment numbers and community activity at a glance.
                 </p>
               </div>
-              {/* Trainer Info Card */}
               <div className="bg-[#120c09] border border-white/5 rounded-2xl p-6 space-y-2">
                 <h3 className="text-xl font-extrabold uppercase tracking-tight text-white">
                   {user?.name || "DANA WHITLOCK"}
@@ -196,7 +195,6 @@ export default function TrainerDashboardPage() {
                 </div>
               </div>
 
-              {/* Stats Cards Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-[#120c09] border border-white/5 rounded-2xl p-5 flex items-start justify-between">
                   <div>
@@ -204,7 +202,6 @@ export default function TrainerDashboardPage() {
                       CLASSES CREATED
                     </span>
                     <p className="text-3xl font-extrabold">6</p>
-                    <p className="text-[11px] text-[#9CA3AF] mt-1">4 approved</p>
                   </div>
                   <div className="p-2.5 rounded-xl bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/20">
                     <FiLayers className="w-5 h-5" />
@@ -217,7 +214,6 @@ export default function TrainerDashboardPage() {
                       STUDENTS ENROLLED
                     </span>
                     <p className="text-3xl font-extrabold">512</p>
-                    <p className="text-[11px] text-[#9CA3AF] mt-1">+38 this month</p>
                   </div>
                   <div className="p-2.5 rounded-xl bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/20">
                     <FiUsers className="w-5 h-5" />
@@ -227,23 +223,9 @@ export default function TrainerDashboardPage() {
                 <div className="bg-[#120c09] border border-white/5 rounded-2xl p-5 flex items-start justify-between">
                   <div>
                     <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider block mb-1">
-                      AVG. RATING
-                    </span>
-                    <p className="text-3xl font-extrabold">4.9</p>
-                    <p className="text-[11px] text-[#9CA3AF] mt-1">from 214 reviews</p>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/20">
-                    <FiStar className="w-5 h-5" />
-                  </div>
-                </div>
-
-                <div className="bg-[#120c09] border border-white/5 rounded-2xl p-5 flex items-start justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider block mb-1">
                       FORUM POSTS
                     </span>
                     <p className="text-3xl font-extrabold">9</p>
-                    <p className="text-[11px] text-[#9CA3AF] mt-1">2 this week</p>
                   </div>
                   <div className="p-2.5 rounded-xl bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/20">
                     <FiTrendingUp className="w-5 h-5" />
@@ -253,24 +235,13 @@ export default function TrainerDashboardPage() {
             </div>
           )}
 
-          {/* OTHER TAB PLACEHOLDERS */}
-          {activeTab === 'my-classes' && (
-            <div className="space-y-2">
-              <h1 className="text-2xl font-extrabold uppercase tracking-tight">My Classes</h1>
-              <p className="text-xs text-[#9CA3AF]">Manage existing classes and session schedules.</p>
-            </div>
-          )}
+          {activeTab === 'my-classes' && <MyClasses></MyClasses>}
 
           {activeTab === 'add-class' && <AddClass />}
 
           {activeTab === 'add-forum-post' && <AddForumPost />}
 
-          {activeTab === 'my-forum-posts' && (
-            <div className="space-y-2">
-              <h1 className="text-2xl font-extrabold uppercase tracking-tight">My Forum Posts</h1>
-              <p className="text-xs text-[#9CA3AF]">View and manage your active forum discussions.</p>
-            </div>
-          )}
+          {activeTab === 'my-forum-posts' && <ForumPostList></ForumPostList>}
 
         </main>
       </div>
