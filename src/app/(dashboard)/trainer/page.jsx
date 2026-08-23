@@ -19,6 +19,7 @@ import AddClass from '@/components/trainer/AddClass';
 import AddForumPost from '@/components/trainer/AddPost';
 import MyClasses from '@/components/trainer/MyClass';
 import ForumPostList from '@/components/trainer/MyForum';
+import { redirect } from 'next/navigation';
 
 export default function TrainerDashboardPage() {
   // Default tab is 'overview' on reload
@@ -40,6 +41,7 @@ export default function TrainerDashboardPage() {
 
   const handleSignOut = async () => {
     await authClient.signOut();
+    redirect('/');
   };
 
   return (
