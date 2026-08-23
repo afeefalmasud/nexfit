@@ -92,7 +92,7 @@ useEffect(() => {
               </thead>
               <tbody className="divide-y divide-white/5 text-xs text-white">
                 {classes.map((item) => (
-                  <tr key={item._id} className="hover:bg-white/[0.02] transition-colors">
+                  <tr key={item._id} className="hover:bg-white/2 transition-colors">
                     {/* Class Info */}
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">

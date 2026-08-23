@@ -13,7 +13,7 @@ const Card = ({ allclass = [], className = '' }) => {
           <div className="relative h-52 w-full bg-[#1b120c] overflow-hidden p-3">
             <img
               src={item.coverImage || item.image || 'https://via.placeholder.com/400x250'}
-              alt={item.title || 'Class Image'}
+              alt={item.className || item.title || 'Class Image'}
               className="w-full h-full object-cover rounded-xl"
             />
 
@@ -31,13 +31,14 @@ const Card = ({ allclass = [], className = '' }) => {
           {/* Card Body */}
           <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
             <div>
+              {/* 1st: Class Name */}
               <h3 className="text-base font-extrabold uppercase text-white tracking-wide truncate group-hover:text-[#f97316] transition-colors duration-300">
-                {item.title}
+                {item.className || item.title || 'UNNAMED CLASS'}
               </h3>
               
-              {/* Trainer Name Display with Fallbacks */}
+              {/* 2nd: Trainer Name */}
               <p className="text-xs text-gray-400 mt-1.5 font-medium truncate">
-                {item.trainerName || item.className || item.trainerEmail || 'Master Trainer'}
+                {item.trainerName || item.trainerEmail || item.instructor || 'Master Trainer'}
               </p>
             </div>
 
