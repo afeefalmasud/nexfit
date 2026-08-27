@@ -54,7 +54,7 @@ const ForumCard = ({ posts = [], className = '' }) => {
                 {/* Read More Link */}
                 <div className="flex justify-end pt-1">
                   <Link
-                    href={`/forum/${post._id}`}
+                    href={`/community/${post._id}`}
                     className="text-[#f97316] hover:text-[#ff8a3d] text-[11px] font-bold tracking-wider transition-colors"
                   >
                     Read more

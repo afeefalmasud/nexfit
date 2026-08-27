@@ -23,7 +23,7 @@ export default function ForumClientWrapper({ initialPosts = [] }) {
   });
 
   return (
-    <div className="space-y-8 bg-[#0a0604] border-t border-white/5">
+    <div className="space-y-8 bg-[#0a0604] border-t border-white/5 min-h-screen">
       <div className="container mx-auto pt-10 pb-16 px-6">
         <div className="bg-[#120c09] mb-10 border border-white/5 rounded-2xl p-2.5 md:p-3 max-w-full">
           <div className="relative w-full">

@@ -30,7 +30,7 @@ export default function ClassesClientWrapper({ initialClasses = [] }) {
   });
 
   return (
-    <div className="space-y-8 bg-[#0a0604] border-t border-white/5 ">
+    <div className="space-y-8 bg-[#0a0604] border-t border-white/5 min-h-screen ">
       <div className="container mx-auto pt-10 pb-16 px-6">
         {/* Filter and Search Bar */}
         <ClassFilterSearch
