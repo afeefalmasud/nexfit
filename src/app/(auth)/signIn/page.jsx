@@ -93,45 +93,12 @@ const SignInForm = () => {
                 WELCOME BACK
               </h1>
               <p className="text-xs text-[#9CA3AF]">
-                Select your role and sign in to access your dashboard.
+                Sign in to access your dashboard.
               </p>
             </div>
           </div>
 
           <form onSubmit={onSubmit} className="space-y-4">
-            {/* Hidden Input to send selected Role in FormData */}
-            <input type="hidden" name="role" value={role} />
-
-            {/* Role Selection */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-[#9CA3AF]">
-                Sign In As
-              </label>
-              <div className="grid grid-cols-3 gap-2.5">
-                {[
-                  { id: 'member', label: 'MEMBER', Icon: FiUser },
-                  { id: 'trainer', label: 'TRAINER', Icon: FiSliders },
-                  { id: 'admin', label: 'ADMIN', Icon: FiShield },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setRole(item.id)}
-                    className={`flex flex-col items-center justify-center py-3 rounded-xl border transition-all cursor-pointer active:scale-95 ${
-                      role === item.id
-                        ? "bg-[#f97316]/10 border-[#f97316] text-[#f97316] shadow-[0_0_15px_rgba(249,115,22,0.2)]"
-                        : "bg-[#140F0D] border-white/10 text-[#9CA3AF] hover:border-white/20"
-                    }`}
-                  >
-                    <item.Icon className="w-4 h-4 mb-1" />
-                    <span className="text-[10px] font-bold uppercase tracking-wider">
-                      {item.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-[#9CA3AF]">
                 Email
@@ -162,7 +129,7 @@ const SignInForm = () => {
               type="submit"
               className="w-full py-3.5 rounded-xl bg-[#f97316] text-black font-extrabold text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(249,115,22,0.35)] hover:bg-[#ea580c] active:scale-95 transition-all duration-150 cursor-pointer pt-3"
             >
-              LOG IN AS {role.toUpperCase()}
+              LOG IN
             </button>
           </form>
 

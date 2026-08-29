@@ -47,9 +47,6 @@ const Navbar = () => {
           <li>
             <NavLink href="/community">Community</NavLink>
           </li>
-          <li>
-            <NavLink href="/membership">Membership</NavLink>
-          </li>
         </ul>
 
         <div className="hidden lg:flex ">
@@ -74,7 +71,6 @@ const Navbar = () => {
             <NavLink href="/">Home</NavLink>
             <NavLink href="/classes">All Classes</NavLink>
             <NavLink href="/community">Community</NavLink>
-            <NavLink href="/membership">Membership</NavLink>
           </div>
         </div>
       )}

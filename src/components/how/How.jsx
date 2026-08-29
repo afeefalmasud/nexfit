@@ -47,13 +47,6 @@ export default function HowItWorks() {
             >
               CREATE ACCOUNT
             </Link>
-
-            <Link
-              href="/membership"
-              className="px-6 py-3.5 rounded-xl bg-[#1C1613] border border-white/5 text-xs text-white font-semibold uppercase tracking-wider hover:bg-white/10 hover:border-white/10 active:scale-95 transition-all duration-150 cursor-pointer"
-            >
-              See membership
-            </Link>
           </div>
         </div>
 

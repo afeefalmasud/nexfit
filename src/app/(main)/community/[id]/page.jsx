@@ -1,4 +1,4 @@
-// app/forum/[id]/page.jsx
+
 
 import ForumDetailsClient from "@/components/forumdetails/forumdetails";
 import { notFound } from "next/navigation";

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { PostDelete } from './ForumPostDelete';
 
-export default function ForumPostList() {
+export default function ForumPostList(id) {
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
@@ -122,7 +122,7 @@ export default function ForumPostList() {
                   <div className="flex items-center gap-4 pt-1">
                     {/* View Button */}
                     <Link
-                      href="#" // TODO: Add view post link
+                      href={`/community/${post._id}`}// TODO: Add view post link
                       className="px-4 py-1.5 bg-[#f97316]/10 hover:bg-[#f97316]/20 border border-[#f97316]/30 rounded-lg text-[#f97316] text-xs font-black uppercase tracking-wider transition-colors inline-block"
                     >
                       VIEW
