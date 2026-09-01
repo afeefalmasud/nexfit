@@ -41,7 +41,7 @@ export default function AddForumPost() {
       if (res?.insertedId) {
         setStatusMessage({
           type: 'success',
-          text: 'Post published successfully to the forum!',
+          text: 'Post submitted successfully! It is currently pending admin review.',
         });
         setFormData({
           title: '',

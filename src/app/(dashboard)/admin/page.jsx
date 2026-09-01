@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FiUsers, FiBox, FiCalendar } from 'react-icons/fi';
+import { FiUsers, FiBox, FiCalendar, FiMessageSquare } from 'react-icons/fi';
 import { useSession } from '@/lib/auth-client';
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
@@ -14,6 +14,7 @@ export default function AdminOverviewPage() {
     totalUsers: 0,
     totalClasses: 0,
     bookedClasses: 0,
+    totalForumPosts: 0,
   });
 
   const [transactions, setTransactions] = useState([]);
@@ -47,12 +48,12 @@ export default function AdminOverviewPage() {
           ADMIN OVERVIEW
         </h1>
         <p className="text-xs text-[#9CA3AF]/80">
-          Membership growth, class inventory and revenue across the whole platform.
+          Membership growth, class inventory, community posts, and revenue across the whole platform.
         </p>
       </div>
 
-      {/* 3 Stat Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* 4 Stat Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Users */}
         <div className="bg-[#120c09] border border-white/5 rounded-2xl p-6 flex items-center gap-5">
           <div className="w-12 h-12 rounded-2xl bg-[#1d140e] border border-white/5 flex items-center justify-center text-[#f97316] shrink-0">
@@ -63,9 +64,8 @@ export default function AdminOverviewPage() {
               TOTAL USERS
             </span>
             <div className="text-2xl font-black text-white mt-0.5">
-              {loading ? '...' : stats.totalUsers?.toLocaleString()}
+              {loading ? '...' : stats.totalUsers?.toLocaleString() || 0}
             </div>
-            
           </div>
         </div>
 
@@ -79,7 +79,7 @@ export default function AdminOverviewPage() {
               TOTAL CLASSES
             </span>
             <div className="text-2xl font-black text-white mt-0.5">
-              {loading ? '...' : stats.totalClasses?.toLocaleString()}
+              {loading ? '...' : stats.totalClasses?.toLocaleString() || 0}
             </div>
           </div>
         </div>
@@ -94,9 +94,23 @@ export default function AdminOverviewPage() {
               BOOKED CLASSES
             </span>
             <div className="text-2xl font-black text-white mt-0.5">
-              {loading ? '...' : stats.bookedClasses?.toLocaleString()}
+              {loading ? '...' : stats.bookedClasses?.toLocaleString() || 0}
             </div>
-           
+          </div>
+        </div>
+
+        {/* Total Forum Posts */}
+        <div className="bg-[#120c09] border border-white/5 rounded-2xl p-6 flex items-center gap-5">
+          <div className="w-12 h-12 rounded-2xl bg-[#1d140e] border border-white/5 flex items-center justify-center text-[#f97316] shrink-0">
+            <FiMessageSquare className="w-5 h-5" />
+          </div>
+          <div>
+            <span className="text-[10px] font-extrabold text-[#9CA3AF]/60 uppercase tracking-widest block">
+              FORUM POSTS
+            </span>
+            <div className="text-2xl font-black text-white mt-0.5">
+              {loading ? '...' : (stats.totalForum ?? 0).toLocaleString()}
+            </div>
           </div>
         </div>
       </div>

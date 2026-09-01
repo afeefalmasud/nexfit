@@ -88,7 +88,6 @@ export default function ManagePostsClient() {
               <tr className="border-b border-white/5 text-[11px] font-extrabold text-[#9CA3AF]/60 uppercase tracking-wider">
                 <th className="py-4 px-6">Title & Preview</th>
                 <th className="py-4 px-6">Author</th>
-                <th className="py-4 px-6">Category</th>
                 <th className="py-4 px-6">Status</th>
                 <th className="py-4 px-6 text-right">Actions</th>
               </tr>
@@ -124,7 +123,6 @@ export default function ManagePostsClient() {
                         <div>{item.trainerName || item.trainer || 'N/A'}</div>
                         <div className="text-[10px] text-[#9CA3AF]/50">{item.authorEmail}</div>
                       </td>
-                      <td className="py-4 px-6 text-[#9CA3AF]">{item.category || 'General'}</td>
                       <td className="py-4 px-6">
                         {status === 'approved' ? (
                           <span className="inline-block bg-emerald-950/40 text-emerald-500 border border-emerald-500/20 px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider">
