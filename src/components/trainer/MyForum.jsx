@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { PostDelete } from './ForumPostDelete';
 
-export default function ForumPostList(id) {
+export default function ForumPostList() {
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
@@ -29,6 +29,11 @@ export default function ForumPostList(id) {
     }
   }, [user, isPending]);
 
+  // Handle local removal after deletion
+  const handleDeleteSuccess = (deletedPostId) => {
+    setForum((prev) => prev.filter((item) => item._id !== deletedPostId));
+  };
+
   return (
     <div className="space-y-6 max-w-5xl">
       {/* Header Info */}
@@ -40,7 +45,7 @@ export default function ForumPostList(id) {
           MY FORUM POSTS
         </h1>
         <p className="text-xs text-[#9CA3AF]">
-          Everything you've published to the NexFit community.
+          Manage and track all community posts you've submitted.
         </p>
       </div>
 
@@ -87,13 +92,15 @@ export default function ForumPostList(id) {
                 })
               : 'Recent';
 
+            const status = post.status?.toLowerCase() || 'pending';
+
             return (
               <div
                 key={post._id}
-                className="bg-[#120c09] border border-white/5 rounded-2xl p-4 md:p-5 flex items-center gap-5 hover:border-white/10 transition-colors"
+                className="bg-[#120c09] border border-white/5 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-5 hover:border-white/10 transition-colors"
               >
                 {/* Image Container */}
-                <div className="w-28 h-28 md:w-36 md:h-24 rounded-xl overflow-hidden bg-[#1b120c] shrink-0 border border-white/5">
+                <div className="w-full md:w-36 h-36 md:h-24 rounded-xl overflow-hidden bg-[#1b120c] shrink-0 border border-white/5">
                   <img
                     src={
                       post.coverImage ||
@@ -110,26 +117,45 @@ export default function ForumPostList(id) {
 
                 {/* Post Details */}
                 <div className="flex-1 min-w-0 space-y-2">
-                  <h3 className="text-base md:text-lg font-extrabold uppercase text-white tracking-tight leading-snug truncate">
-                    {post.title}
-                  </h3>
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="text-base md:text-lg font-extrabold uppercase text-white tracking-tight leading-snug truncate">
+                      {post.title}
+                    </h3>
 
-                  <p className="text-xs text-[#9CA3AF] font-medium">
-                    {formattedDate}
-                  </p>
+                    {/* Status Badge */}
+                    {status === 'approved' ? (
+                      <span className="inline-block bg-emerald-950/40 text-emerald-500 border border-emerald-500/20 px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shrink-0">
+                        APPROVED
+                      </span>
+                    ) : (
+                      <span className="inline-block bg-amber-950/40 text-amber-500 border border-amber-500/20 px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shrink-0">
+                        PENDING
+                      </span>
+                    )}
+                  </div>
+
 
                   {/* Actions */}
-                  <div className="flex items-center gap-4 pt-1">
+                  <div className="flex items-center gap-4 pt-2">
                     {/* View Button */}
-                    <Link
-                      href={`/community/${post._id}`}// TODO: Add view post link
-                      className="px-4 py-1.5 bg-[#f97316]/10 hover:bg-[#f97316]/20 border border-[#f97316]/30 rounded-lg text-[#f97316] text-xs font-black uppercase tracking-wider transition-colors inline-block"
-                    >
-                      VIEW
-                    </Link>
+                    {status === 'approved' ? (
+                      <Link
+                        href={`/community/${post._id}`}
+                        className="px-4 py-1.5 bg-[#f97316]/10 hover:bg-[#f97316]/20 border border-[#f97316]/30 rounded-lg text-[#f97316] text-xs font-black uppercase tracking-wider transition-colors inline-block"
+                      >
+                        VIEW
+                      </Link>
+                    ) : (
+                      <span className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-lg text-[#9CA3AF]/50 text-xs font-black uppercase tracking-wider cursor-not-allowed inline-block">
+                        UNDER REVIEW
+                      </span>
+                    )}
 
                     {/* Delete Button */}
-                    <PostDelete postId={post._id}></PostDelete>
+                    <PostDelete
+                      postId={post._id}
+                      onDeleteSuccess={() => handleDeleteSuccess(post._id)}
+                    />
                   </div>
                 </div>
               </div>
