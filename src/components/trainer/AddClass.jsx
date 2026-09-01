@@ -36,7 +36,6 @@ export default function AddClass() {
         ...formData,
         trainerId: user?.id, // Unique ID per user
         trainerEmail: user?.email,
-        status: 'approved', // Direct approval until admin functionality is built
       };
 
       const res = await addClass(payload);
@@ -44,7 +43,7 @@ export default function AddClass() {
       if (res?.insertedId) {
         setStatusMessage({
           type: 'success',
-          text: 'Class added and published directly to your dashboard!',
+          text: 'Class submitted successfully! It is currently pending admin review.',
         });
         setFormData({
           className: '',

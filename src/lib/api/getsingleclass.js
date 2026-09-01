@@ -1,6 +1,6 @@
 "use server";
 
-const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
 
 export const SingleClass = async (id) => {
   if (!id) return null;

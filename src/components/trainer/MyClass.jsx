@@ -25,7 +25,6 @@ useEffect(() => {
     setIsLoading(false);
   }
 }, [user, isPending]);
-  // Helper for rendering status badges
   const getStatusBadge = (status) => {
     const normalizedStatus = status?.toLowerCase() || 'pending';
 

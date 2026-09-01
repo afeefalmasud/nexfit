@@ -3,6 +3,7 @@ import { requireRole } from '@/lib/actions/role';
 import { FiArrowLeft } from 'react-icons/fi';
 import SidebarNav from '@/components/admin/sidebar';
 import LogoutButton from '@/components/admin/logout';
+import { FaFire } from 'react-icons/fa';
 
 export default async function AdminLayout({ children }) {
   // Server-side guard
@@ -14,14 +15,14 @@ export default async function AdminLayout({ children }) {
       <aside className="w-64 bg-[#120c09] border-r border-white/5 flex flex-col justify-between p-6 shrink-0 fixed inset-y-0 left-0 z-50">
         <div className="space-y-6">
           {/* Logo & Brand */}
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#f97316] flex items-center justify-center text-white font-black text-lg shadow-lg shadow-[#f97316]/20">
-              N
-            </div>
-            <span className="text-lg font-black tracking-widest text-white uppercase">
-              NEX<span className="text-[#f97316]">FIT</span>
-            </span>
-          </div>
+          <Link href="/" className="flex items-center gap-2.5 px-2">
+                      <div className="w-8 h-8 rounded-lg bg-[#f97316] flex items-center justify-center text-black shadow-[0_0_15px_rgba(249,115,22,0.4)]">
+                        <FaFire className="w-5 h-5 stroke-[2.5]" />
+                      </div>
+                      <span className="text-lg font-extrabold tracking-wider text-white">
+                        NEX<span className="text-[#f97316]">FIT</span>
+                      </span>
+                    </Link>
 
           {/* User Status Badge */}
           <div className="bg-[#1b120c] border border-white/5 rounded-xl p-3 space-y-1">

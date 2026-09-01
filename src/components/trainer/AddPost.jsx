@@ -34,7 +34,6 @@ export default function AddForumPost() {
         description: formData.description,
         trainerId: user?.id,
         trainerEmail: user?.email,
-        status: 'approved',
       };
 
       const res = await addForum(payload);
