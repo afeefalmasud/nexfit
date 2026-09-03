@@ -206,7 +206,7 @@ export default function AdminTransactionsPage() {
                 </tr>
               ) : (
                 transactions.map((tx, idx) => (
-                  <tr key={tx._id || idx} className="hover:bg-white/[0.02] transition-colors">
+                  <tr key={tx._id || idx} className="hover:bg-white/2 transition-colors">
                     <td className="px-6 py-4 font-semibold">
                       {tx.userEmail || tx.email || 'user@nexfit.io'}
                     </td>
