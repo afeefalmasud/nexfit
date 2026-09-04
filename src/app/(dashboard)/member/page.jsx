@@ -10,6 +10,8 @@ import {
   FiUserPlus,
   FiArrowLeft,
   FiLogOut,
+  FiMenu,
+  FiX
 } from 'react-icons/fi';
 import { authClient, useSession } from "@/lib/auth-client";
 import ApplyTrainer from '@/components/member/Apply';
@@ -21,6 +23,7 @@ const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
 
 export default function MemberDashboardPage() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [stats, setStats] = useState({
     bookedCount: 0,
     favoritesCount: 0,
@@ -68,13 +71,52 @@ export default function MemberDashboardPage() {
     redirect('/');
   };
 
+  const handleTabClick = (id) => {
+    setActiveTab(id);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <div className="min-h-screen bg-[#0A0706] text-white flex font-sans">
+    <div className="min-h-screen bg-[#0A0706] text-white flex font-sans relative">
       
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-white/5 bg-[#0e0907] flex flex-col justify-between shrink-0 h-screen sticky top-0 p-5">
+      {/* Mobile Top Header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#0e0907] border-b border-white/5 px-4 flex items-center justify-between z-40">
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-[#f97316] flex items-center justify-center text-black shadow-[0_0_15px_rgba(249,115,22,0.4)]">
+            <FaFire className="w-5 h-5 stroke-[2.5]" />
+          </div>
+          <span className="text-lg font-extrabold tracking-wider text-white">
+            NEX<span className="text-[#f97316]">FIT</span>
+          </span>
+        </Link>
+
+        {/* Hamburger Toggle Button */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle navigation"
+          className="p-2 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors"
+        >
+          {isMobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
+        </button>
+      </header>
+
+      {/* Backdrop Overlay for Mobile */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="lg:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40 transition-opacity"
+        />
+      )}
+
+      {/* Drawer / Sidebar */}
+      <aside
+        className={`w-64 border-r border-white/5 bg-[#0e0907] flex flex-col justify-between shrink-0 h-screen fixed lg:sticky top-0 p-5 z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         <div className="space-y-6">
-          <Link href="/" className="flex items-center gap-2.5 px-2">
+          {/* Logo (Desktop) */}
+          <Link href="/" className="hidden lg:flex items-center gap-2.5 px-2">
             <div className="w-8 h-8 rounded-lg bg-[#f97316] flex items-center justify-center text-black shadow-[0_0_15px_rgba(249,115,22,0.4)]">
               <FaFire className="w-5 h-5 stroke-[2.5]" />
             </div>
@@ -83,7 +125,8 @@ export default function MemberDashboardPage() {
             </span>
           </Link>
 
-          <div className="bg-[#150e0b] border border-white/5 rounded-2xl p-4 flex flex-col justify-center">
+          {/* User Profile Card */}
+          <div className="bg-[#150e0b] border border-white/5 rounded-2xl p-4 flex flex-col justify-center mt-12 lg:mt-0">
             <h3 className="font-bold text-sm text-white truncate">
               {user?.name || "Member"}
             </h3>
@@ -107,7 +150,7 @@ export default function MemberDashboardPage() {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setActiveTab(item.id)}
+                    onClick={() => handleTabClick(item.id)}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
                       isActive
                         ? "bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/30 shadow-[0_0_15px_rgba(249,115,22,0.1)]"
@@ -126,6 +169,7 @@ export default function MemberDashboardPage() {
         <div className="space-y-1 pt-4 border-t border-white/5">
           <Link
             href="/"
+            onClick={() => setIsMobileMenuOpen(false)}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-[#9CA3AF] hover:text-white hover:bg-white/5 transition-colors"
           >
             <FiArrowLeft className="w-4 h-4" />
@@ -144,7 +188,8 @@ export default function MemberDashboardPage() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b border-white/5 bg-[#0e0907]/60 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-40">
+        {/* Top Header Bar (Desktop Only) */}
+        <header className="hidden lg:flex h-16 border-b border-white/5 bg-[#0e0907]/60 backdrop-blur-md px-8 items-center justify-between sticky top-0 z-40">
           <div>
             <p className="text-[10px] font-extrabold tracking-[0.2em] uppercase text-[#9CA3AF]/70">
               MEMBER DASHBOARD
@@ -155,14 +200,14 @@ export default function MemberDashboardPage() {
           </div>
         </header>
 
-        <main className="flex-1 p-8 overflow-y-auto space-y-8">
+        <main className="flex-1 p-6 md:p-8 pt-20 lg:pt-8 overflow-y-auto space-y-8 w-full">
           {activeTab === 'overview' && (
-            <div className="space-y-8">
+            <div className="space-y-8 max-w-6xl">
               <div className="space-y-1">
                 <span className="text-[#f97316] text-[10px] font-extrabold tracking-[0.2em] uppercase">
                   YOUR PROGRESS
                 </span>
-                <h1 className="text-3xl font-extrabold uppercase tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight">
                   MEMBER OVERVIEW
                 </h1>
                 <p className="text-xs text-[#9CA3AF]">
@@ -187,71 +232,70 @@ export default function MemberDashboardPage() {
                 </div>
 
                 {/* Dynamic Application Banner */}
-                {/* Dynamic Application Banner */}
-<div className="bg-[#120c09] border border-white/5 rounded-2xl p-6 space-y-3">
-  <h3 className="text-sm font-extrabold uppercase tracking-tight">
-    TRAINER APPLICATION
-  </h3>
+                <div className="bg-[#120c09] border border-white/5 rounded-2xl p-6 space-y-3">
+                  <h3 className="text-sm font-extrabold uppercase tracking-tight">
+                    TRAINER APPLICATION
+                  </h3>
 
-  {stats.application ? (
-    <>
-      <div className="flex items-center gap-2">
-        <span
-          className={`px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider border ${
-            stats.application.status === 'approved'
-              ? 'bg-green-500/10 text-green-400 border-green-500/20'
-              : stats.application.status === 'rejected'
-              ? 'bg-red-500/10 text-red-400 border-red-500/20'
-              : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-          }`}
-        >
-          {stats.application.status || 'PENDING'}
-        </span>
-        <span className="text-xs text-[#9CA3AF]">
-          Applied {new Date(stats.application.appliedAt).toLocaleDateString()}
-        </span>
-      </div>
+                  {stats.application ? (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider border ${
+                            stats.application.status === 'approved'
+                              ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                              : stats.application.status === 'rejected'
+                              ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                              : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                          }`}
+                        >
+                          {stats.application.status || 'PENDING'}
+                        </span>
+                        <span className="text-xs text-[#9CA3AF]">
+                          Applied {new Date(stats.application.appliedAt).toLocaleDateString()}
+                        </span>
+                      </div>
 
-      {stats.application.status === 'approved' && (
-        <p className="text-xs text-[#9CA3AF] leading-relaxed">
-          Congratulations! Your application was approved. You now have trainer access.
-        </p>
-      )}
+                      {stats.application.status === 'approved' && (
+                        <p className="text-xs text-[#9CA3AF] leading-relaxed">
+                          Congratulations! Your application was approved. You now have trainer access.
+                        </p>
+                      )}
 
-      {stats.application.status === 'rejected' && (
-        <div className="space-y-2">
-          <p className="text-xs text-red-400 font-semibold">
-            Your application was rejected.
-          </p>
-          {stats.application.rejectionReason && (
-            <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-3 text-xs text-[#9CA3AF]">
-              <span className="text-white font-bold block mb-0.5">Reason:</span>
-              {stats.application.rejectionReason}
-            </div>
-          )}
-        </div>
-      )}
+                      {stats.application.status === 'rejected' && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-red-400 font-semibold">
+                            Your application was rejected.
+                          </p>
+                          {stats.application.rejectionReason && (
+                            <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-3 text-xs text-[#9CA3AF]">
+                              <span className="text-white font-bold block mb-0.5">Reason:</span>
+                              {stats.application.rejectionReason}
+                            </div>
+                          )}
+                        </div>
+                      )}
 
-      {stats.application.status === 'pending' && (
-        <p className="text-xs text-[#9CA3AF] leading-relaxed">
-          Our admin team is reviewing your application. You'll be notified here once updated.
-        </p>
-      )}
-    </>
-  ) : (
-    <>
-      <p className="text-xs text-[#9CA3AF] leading-relaxed">
-        Interested in coaching at NexFit? Submit your specialty and experience to become a certified trainer.
-      </p>
-      <button
-        onClick={() => setActiveTab('apply-trainer')}
-        className="px-4 py-2 bg-[#f97316] text-black text-xs font-extrabold rounded-xl uppercase tracking-wider hover:bg-[#ea580c] transition-colors"
-      >
-        Apply Now
-      </button>
-    </>
-  )}
-</div>
+                      {stats.application.status === 'pending' && (
+                        <p className="text-xs text-[#9CA3AF] leading-relaxed">
+                          Our admin team is reviewing your application. You'll be notified here once updated.
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-xs text-[#9CA3AF] leading-relaxed">
+                        Interested in coaching at NexFit? Submit your specialty and experience to become a certified trainer.
+                      </p>
+                      <button
+                        onClick={() => handleTabClick('apply-trainer')}
+                        className="px-4 py-2 bg-[#f97316] text-black text-xs font-extrabold rounded-xl uppercase tracking-wider hover:bg-[#ea580c] transition-colors"
+                      >
+                        Apply Now
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
 
               {/* Dynamic Stats Cards Grid */}

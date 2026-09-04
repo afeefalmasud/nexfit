@@ -11,8 +11,9 @@ import {
   FiFileText, 
   FiArrowLeft, 
   FiLogOut, 
-  FiUsers,
-  FiTrendingUp
+  FiTrendingUp,
+  FiMenu,
+  FiX
 } from 'react-icons/fi';
 import { authClient, useSession } from "@/lib/auth-client";
 import AddClass from '@/components/trainer/AddClass';
@@ -26,6 +27,7 @@ const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
 
 export default function TrainerDashboardPage() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Dynamic stats state
   const [stats, setStats] = useState({
@@ -76,15 +78,53 @@ export default function TrainerDashboardPage() {
     redirect('/');
   };
 
+  const handleTabClick = (id) => {
+    setActiveTab(id);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <div className="min-h-screen bg-[#0A0706] text-white flex font-sans">
+    <div className="min-h-screen bg-[#0A0706] text-white flex font-sans relative">
       
-      {/* Persistent Left Sidebar */}
-      <aside className="w-64 border-r border-white/5 bg-[#0e0907] flex flex-col justify-between shrink-0 h-screen sticky top-0 p-5">
+      {/* Mobile Top Header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#0e0907] border-b border-white/5 px-4 flex items-center justify-between z-40">
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-[#f97316] flex items-center justify-center text-black shadow-[0_0_15px_rgba(249,115,22,0.4)]">
+            <FaFireIcon className="w-5 h-5 stroke-[2.5]" />
+          </div>
+          <span className="text-lg font-extrabold tracking-wider text-white">
+            NEX<span className="text-[#f97316]">FIT</span>
+          </span>
+        </Link>
+
+        {/* Hamburger Toggle Button */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle navigation"
+          className="p-2 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors"
+        >
+          {isMobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
+        </button>
+      </header>
+
+      {/* Backdrop Overlay for Mobile */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="lg:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40 transition-opacity"
+        />
+      )}
+
+      {/* Drawer / Sidebar */}
+      <aside
+        className={`w-64 border-r border-white/5 bg-[#0e0907] flex flex-col justify-between shrink-0 h-screen fixed lg:sticky top-0 p-5 z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         <div className="space-y-6">
           
-          {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-2.5 px-2">
+          {/* Brand Logo (Visible on Desktop) */}
+          <Link href="/" className="hidden lg:flex items-center gap-2.5 px-2">
             <div className="w-8 h-8 rounded-lg bg-[#f97316] flex items-center justify-center text-black shadow-[0_0_15px_rgba(249,115,22,0.4)]">
               <FaFireIcon className="w-5 h-5 stroke-[2.5]" />
             </div>
@@ -94,7 +134,7 @@ export default function TrainerDashboardPage() {
           </Link>
 
           {/* User Profile Card */}
-          <div className="bg-[#150e0b] border border-white/5 rounded-2xl p-4 flex flex-col justify-center">
+          <div className="bg-[#150e0b] border border-white/5 rounded-2xl p-4 flex flex-col justify-center mt-12 lg:mt-0">
             <h3 className="font-bold text-sm text-white truncate">
               {user?.name || "Trainer"}
             </h3>
@@ -119,7 +159,7 @@ export default function TrainerDashboardPage() {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => setActiveTab(item.id)}
+                      onClick={() => handleTabClick(item.id)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
                         isActive
                           ? "bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/30 shadow-[0_0_15px_rgba(249,115,22,0.1)]"
@@ -146,7 +186,7 @@ export default function TrainerDashboardPage() {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => setActiveTab(item.id)}
+                      onClick={() => handleTabClick(item.id)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
                         isActive
                           ? "bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/30 shadow-[0_0_15px_rgba(249,115,22,0.1)]"
@@ -167,6 +207,7 @@ export default function TrainerDashboardPage() {
         <div className="space-y-1 pt-4 border-t border-white/5">
           <Link
             href="/"
+            onClick={() => setIsMobileMenuOpen(false)}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-[#9CA3AF] hover:text-white hover:bg-white/5 transition-colors"
           >
             <FiArrowLeft className="w-4 h-4" />
@@ -186,8 +227,8 @@ export default function TrainerDashboardPage() {
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-w-0">
         
-        {/* Top Header Bar */}
-        <header className="h-16 border-b border-white/5 bg-[#0e0907]/60 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-40">
+        {/* Top Header Bar (Desktop Only) */}
+        <header className="hidden lg:flex h-16 border-b border-white/5 bg-[#0e0907]/60 backdrop-blur-md px-8 items-center justify-between sticky top-0 z-40">
           <div>
             <p className="text-[10px] font-extrabold tracking-[0.2em] uppercase text-[#9CA3AF]/70">
               TRAINER DASHBOARD
@@ -199,7 +240,7 @@ export default function TrainerDashboardPage() {
         </header>
 
         {/* Tab Content Views */}
-        <main className="flex-1 p-8 overflow-y-auto">
+        <main className="flex-1 p-6 md:p-8 pt-20 lg:pt-8 overflow-y-auto w-full">
           
           {/* OVERVIEW VIEW */}
           {activeTab === 'overview' && (
@@ -208,7 +249,7 @@ export default function TrainerDashboardPage() {
                 <span className="text-[#f97316] text-[10px] font-extrabold tracking-[0.2em] uppercase">
                   COACHING
                 </span>
-                <h1 className="text-3xl font-extrabold uppercase tracking-tight text-white">
+                <h1 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white">
                   TRAINER OVERVIEW
                 </h1>
                 <p className="text-xs text-[#9CA3AF]">
@@ -246,7 +287,6 @@ export default function TrainerDashboardPage() {
                   </div>
                 </div>
 
-               
                 <div className="bg-[#120c09] border border-white/5 rounded-2xl p-5 flex items-start justify-between">
                   <div>
                     <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider block mb-1">
