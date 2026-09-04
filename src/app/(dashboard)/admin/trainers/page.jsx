@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithAuth } from '@/lib/actions/api';
 import { useState, useEffect } from 'react';
 import { FiUserMinus, FiUserPlus } from 'react-icons/fi';
 
@@ -11,7 +12,7 @@ export default function ManageTrainersClient() {
 
   const fetchTrainers = async () => {
     try {
-      const res = await fetch(`${baseURL}/api/admin/trainers`);
+      const res = await fetchWithAuth('/api/admin/trainers');
       const data = await res.json();
       if (Array.isArray(data)) setTrainers(data);
       setLoading(false);

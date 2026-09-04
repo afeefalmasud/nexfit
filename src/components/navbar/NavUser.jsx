@@ -9,13 +9,16 @@ import { FiLayout, FiLogOut } from "react-icons/fi";
 const NavUser = () => {
   const { data, isPending } = useSession();
   const user = data?.user;
+
   const [isOpen, setIsOpen] = useState(false);
-  const [dbRole, setDbRole] = useState(null); // Stores fetched MongoDB role
+  const [dbRole, setDbRole] = useState(null);
+  const [isRoleLoading, setIsRoleLoading] = useState(true); 
   const dropdownRef = useRef(null);
 
   // Fetch role directly from MongoDB when user logs in
   useEffect(() => {
     if (user?.email) {
+      setIsRoleLoading(true);
       fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user?email=${user.email}`)
         .then((res) => res.json())
         .then((data) => {
@@ -23,7 +26,10 @@ const NavUser = () => {
             setDbRole(data.user.role);
           }
         })
-        .catch((err) => console.error("Failed to fetch user role:", err));
+        .catch((err) => console.error("Failed to fetch user role:", err))
+        .finally(() => setIsRoleLoading(false));
+    } else {
+      setIsRoleLoading(false);
     }
   }, [user?.email]);
 
@@ -36,6 +42,7 @@ const NavUser = () => {
       ? "/member"
       : "/admin";
 
+  // Handle outside click for dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -46,10 +53,19 @@ const NavUser = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (isPending) {
-    return <span className="loading loading-ring loading-lg text-[#f97316]"></span>;
+  // 1. Show Loading State while Session or Role is resolving
+  if (isPending || (user && isRoleLoading)) {
+    return (
+      <div className="flex items-center gap-3">
+        {/* Animated Avatar Skeleton */}
+        <div className="w-10 h-10 rounded-full bg-[#1b120c] border border-white/10 animate-pulse flex items-center justify-center">
+          <div className="w-4 h-4 border-2 border-[#f97316] border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
   }
 
+  // 2. Render Component once loaded
   return (
     <div>
       {user ? (

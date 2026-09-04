@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaFire as FaFireIcon } from 'react-icons/fa';
 import { 
@@ -20,13 +20,45 @@ import AddForumPost from '@/components/trainer/AddPost';
 import MyClasses from '@/components/trainer/MyClass';
 import ForumPostList from '@/components/trainer/MyForum';
 import { redirect } from 'next/navigation';
+import { fetchWithAuth } from '@/lib/actions/api';
+
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
 
 export default function TrainerDashboardPage() {
-  // Default tab is 'overview' on reload
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Dynamic stats state
+  const [stats, setStats] = useState({
+    classesCreated: 0,
+    studentsEnrolled: 0,
+    forumPosts: 0,
+  });
+  const [loadingStats, setLoadingStats] = useState(true);
 
   const { data } = useSession();
   const user = data?.user;
+
+  // Fetch stats from backend
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const fetchTrainerStats = async () => {
+      setLoadingStats(true);
+      try {
+        const res = await fetchWithAuth(`/api/trainer/stats?email=${encodeURIComponent(user.email)}`);
+        const data = await res.json();
+        if (data.success && data.stats) {
+          setStats(data.stats);
+        }
+      } catch (error) {
+        console.error('Failed to fetch trainer stats:', error);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+
+    fetchTrainerStats();
+  }, [user?.email]);
 
   const coachingNav = [
     { id: 'overview', label: 'Overview', icon: FiGrid },
@@ -64,7 +96,7 @@ export default function TrainerDashboardPage() {
           {/* User Profile Card */}
           <div className="bg-[#150e0b] border border-white/5 rounded-2xl p-4 flex flex-col justify-center">
             <h3 className="font-bold text-sm text-white truncate">
-              {user?.name || "Dana Whitlock"}
+              {user?.name || "Trainer"}
             </h3>
             <div className="inline-flex items-center gap-1.5 mt-1">
               <span className="px-2 py-0.5 rounded-md bg-[#f97316]/15 text-[#f97316] text-[10px] font-extrabold uppercase tracking-wider border border-[#f97316]/20">
@@ -161,7 +193,7 @@ export default function TrainerDashboardPage() {
               TRAINER DASHBOARD
             </p>
             <p className="text-xs text-white font-medium">
-              Welcome back, <span className="text-white font-bold">{user?.name || "Dana Whitlock"}</span>
+              Welcome back, <span className="text-white font-bold">{user?.name || "Trainer"}</span>
             </p>
           </div>
         </header>
@@ -183,12 +215,13 @@ export default function TrainerDashboardPage() {
                   Your classes, enrolment numbers and community activity at a glance.
                 </p>
               </div>
+
               <div className="bg-[#120c09] border border-white/5 rounded-2xl p-6 space-y-2">
                 <h3 className="text-xl font-extrabold uppercase tracking-tight text-white">
-                  {user?.name || "DANA WHITLOCK"}
+                  {user?.name || "TRAINER"}
                 </h3>
                 <p className="text-xs text-[#9CA3AF]">
-                  {user?.email || "dana@nexfit.io"}
+                  {user?.email || "trainer@nexfit.io"}
                 </p>
                 <div>
                   <span className="inline-block px-3 py-1 rounded-md bg-[#f97316]/10 text-[#f97316] text-[10px] font-extrabold uppercase tracking-wider border border-[#f97316]/20">
@@ -197,37 +230,31 @@ export default function TrainerDashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Dynamic Stats Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="bg-[#120c09] border border-white/5 rounded-2xl p-5 flex items-start justify-between">
                   <div>
                     <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider block mb-1">
                       CLASSES CREATED
                     </span>
-                    <p className="text-3xl font-extrabold">6</p>
+                    <p className="text-3xl font-extrabold">
+                      {loadingStats ? "..." : stats.classesCreated}
+                    </p>
                   </div>
                   <div className="p-2.5 rounded-xl bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/20">
                     <FiLayers className="w-5 h-5" />
                   </div>
                 </div>
 
-                <div className="bg-[#120c09] border border-white/5 rounded-2xl p-5 flex items-start justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider block mb-1">
-                      STUDENTS ENROLLED
-                    </span>
-                    <p className="text-3xl font-extrabold">512</p>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/20">
-                    <FiUsers className="w-5 h-5" />
-                  </div>
-                </div>
-
+               
                 <div className="bg-[#120c09] border border-white/5 rounded-2xl p-5 flex items-start justify-between">
                   <div>
                     <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider block mb-1">
                       FORUM POSTS
                     </span>
-                    <p className="text-3xl font-extrabold">9</p>
+                    <p className="text-3xl font-extrabold">
+                      {loadingStats ? "..." : stats.forumPosts}
+                    </p>
                   </div>
                   <div className="p-2.5 rounded-xl bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/20">
                     <FiTrendingUp className="w-5 h-5" />
@@ -237,13 +264,13 @@ export default function TrainerDashboardPage() {
             </div>
           )}
 
-          {activeTab === 'my-classes' && <MyClasses></MyClasses>}
+          {activeTab === 'my-classes' && <MyClasses />}
 
           {activeTab === 'add-class' && <AddClass />}
 
           {activeTab === 'add-forum-post' && <AddForumPost />}
 
-          {activeTab === 'my-forum-posts' && <ForumPostList></ForumPostList>}
+          {activeTab === 'my-forum-posts' && <ForumPostList />}
 
         </main>
       </div>

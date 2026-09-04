@@ -15,6 +15,7 @@ import { authClient, useSession } from "@/lib/auth-client";
 import ApplyTrainer from '@/components/member/Apply';
 import BookedClasses from '@/components/member/Classes';
 import FavoriteClasses from '@/components/member/Favt';
+import { redirect } from 'next/navigation';
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
 
@@ -64,6 +65,7 @@ export default function MemberDashboardPage() {
 
   const handleSignOut = async () => {
     await authClient.signOut();
+    redirect('/');
   };
 
   return (

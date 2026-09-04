@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithAuth } from '@/lib/actions/api';
 import { useState, useEffect } from 'react';
 import { FiDollarSign, FiTrendingUp, FiCreditCard } from 'react-icons/fi';
 import {
@@ -26,7 +27,7 @@ export default function AdminTransactionsPage() {
   });
 
   useEffect(() => {
-    fetch(`${baseURL}/api/admin/transactions`)
+    fetchWithAuth('/api/admin/transactions')
       .then((res) => res.json())
       .then((data) => {
         const txList = Array.isArray(data.transactions) ? data.transactions : Array.isArray(data) ? data : [];

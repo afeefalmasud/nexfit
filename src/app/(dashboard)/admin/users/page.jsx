@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithAuth } from '@/lib/actions/api';
 import { useState, useEffect } from 'react';
 import { FiSearch, FiSlash, FiUnlock } from 'react-icons/fi';
 
@@ -13,7 +14,7 @@ export default function ManageUsersClient() {
   // Fetch users
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`${baseURL}/api/admin/users`);
+      const res = await fetchWithAuth('/api/admin/users');
       const data = await res.json();
       if (Array.isArray(data)) setUsers(data);
       setLoading(false);

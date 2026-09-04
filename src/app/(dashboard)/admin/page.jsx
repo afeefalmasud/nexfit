@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FiUsers, FiBox, FiCalendar, FiMessageSquare } from 'react-icons/fi';
 import { useSession } from '@/lib/auth-client';
+import { fetchWithAuth } from '@/lib/actions/api';
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
 
@@ -23,8 +24,8 @@ export default function AdminOverviewPage() {
   useEffect(() => {
     // Fetch stats & recent transactions in parallel
     Promise.all([
-      fetch(`${baseURL}/api/admin/overview-stats`).then((res) => res.json()),
-      fetch(`${baseURL}/api/admin/recent-transactions`).then((res) => res.json()),
+      fetchWithAuth('/api/admin/overview-stats').then((res) => res.json()),
+      fetchWithAuth('/api/admin/recent-transactions').then((res) => res.json()),
     ])
       .then(([statsData, txData]) => {
         if (statsData) setStats(statsData);

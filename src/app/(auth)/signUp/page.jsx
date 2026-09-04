@@ -12,6 +12,15 @@ const SignUpForm = () => {
   const [role, setRole] = useState("member"); // 'member' or 'trainer'
   const router = useRouter();
 
+const handleGoogleSignIn = async () => {
+  await authClient.signIn.social({
+    provider: "google",
+    callbackURL: "/?role=member", 
+    additionalData: {
+      role: "member",
+    },
+  });
+};
   const onSubmit = async (e) => {
     e.preventDefault();
 
@@ -184,6 +193,7 @@ const SignUpForm = () => {
 
           <button
             type="button"
+            onClick={handleGoogleSignIn}
             className="w-full py-3 rounded-xl bg-[#140F0D] border border-white/10 text-xs font-semibold text-white flex items-center justify-center gap-3 hover:bg-white/5 active:scale-95 transition-all duration-150 cursor-pointer"
           >
             <FcGoogle className="w-4 h-4" />

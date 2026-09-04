@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithAuth } from '@/lib/actions/api';
 import { useState, useEffect } from 'react';
 import { FiCheck, FiX, FiAlertCircle, FiInfo } from 'react-icons/fi';
 
@@ -19,7 +20,7 @@ export default function AdminAppliedTrainers() {
   const fetchApplications = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${baseURL}/api/admin/applied-trainers`);
+      const res = await fetchWithAuth('/api/admin/applied-trainers');
       if (!res.ok) throw new Error(`Server status ${res.status}`);
       const data = await res.json();
       setApplications(Array.isArray(data) ? data : []);

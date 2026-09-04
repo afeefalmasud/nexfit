@@ -1,5 +1,6 @@
 'use client';
 
+import { fetchWithAuth } from '@/lib/actions/api';
 import { useState, useEffect } from 'react';
 import { FiCheck, FiX, FiAlertTriangle } from 'react-icons/fi';
 
@@ -15,7 +16,7 @@ export default function ManageClassesClient() {
 
   const fetchClasses = async () => {
     try {
-      const res = await fetch(`${baseURL}/api/admin/classes`);
+      const res = await fetchWithAuth('/api/admin/classes');
       const data = await res.json();
       if (Array.isArray(data)) setClasses(data);
       setLoading(false);

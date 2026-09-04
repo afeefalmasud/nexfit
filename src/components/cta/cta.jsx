@@ -21,8 +21,7 @@ export default function CtaBanner() {
           </h2>
 
           <p className="relative z-10 text-[#9CA3AF] text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
-            Join 12,000 members already training with NexFit coaches. First week
-            is on us.
+            Level up your fitness alongside expert NexFit coaches. Start your first week completely free.
           </p>
 
           <div className="relative z-10 flex flex-wrap items-center justify-center gap-4 pt-2">

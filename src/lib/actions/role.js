@@ -1,47 +1,54 @@
 import { headers } from "next/headers";
-import { auth } from "../auth";
 import { redirect } from "next/navigation";
+import { auth } from "../auth";
 
-const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
-export const getUserSession = async () => {
-    const session = await auth.api.getSession({
-        headers: await headers()
-    });
-    return session?.user || null;
-}
+export const getFullSession = async () => {
+  const reqHeaders = await headers();
+  const session = await auth.api.getSession({
+    headers: reqHeaders,
+  });
+  return session || null;
+};
 
 export const requireRole = async (role) => {
-    const sessionUser = await getUserSession();
-    
-    if (!sessionUser) {
-        redirect('/signIn');
-    }
+  const sessionData = await getFullSession();
+  const sessionUser = sessionData?.user;
+  const token = sessionData?.session?.token;
+  const reqHeaders = await headers();
 
-    // Fetch live user status directly from database
-    let liveUser = null;
-    try {
-        const res = await fetch(`${baseURL}/api/users/me?email=${sessionUser.email}`, {
-            cache: 'no-store' // Ensure fresh data on every request
-        });
-        if (res.ok) {
-            liveUser = await res.json();
-        }
-    } catch (error) {
-        console.error("Failed to check user status:", error);
-    }
+  if (!sessionUser) {
+    redirect("/signIn");
+  }
 
-    // 1. Check if user is blocked
-    const status = liveUser?.status || sessionUser.status;
-    if (status?.toLowerCase() === 'blocked') {
-        redirect('/unauthorized?reason=blocked');
+  let liveUser = null;
+  try {
+    const res = await fetch(`${baseURL}/api/users/me?email=${sessionUser.email}`, {
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        // Pass BOTH cookie and Bearer token so Express catches either format
+        Cookie: reqHeaders.get("cookie") || "",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    if (res.ok) {
+      liveUser = await res.json();
     }
+  } catch (error) {
+    console.error("Failed to check user status:", error);
+  }
 
-    // 2. Check role permission
-    const currentRole = liveUser?.role || sessionUser.role;
-    if (role && currentRole?.toLowerCase() !== role.toLowerCase()) {
-        redirect('/unauthorized');
-    }
+  const status = liveUser?.status || sessionUser.status;
+  if (status?.toLowerCase() === "blocked") {
+    redirect("/unauthorized?reason=blocked");
+  }
 
-    return liveUser || sessionUser;
-}
+  const currentRole = liveUser?.role || sessionUser.role;
+  if (role && currentRole?.toLowerCase() !== role.toLowerCase()) {
+    redirect("/unauthorized");
+  }
+
+  return liveUser || sessionUser;
+};

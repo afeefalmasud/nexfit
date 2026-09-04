@@ -11,12 +11,15 @@ import { redirect } from "next/navigation";
 const SignInForm = () => {
   const [role, setRole] = useState("member"); // 'member', 'trainer', or 'admin'
 
-  const handleGoogleSignIn = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/dashboard",
-    });
-  };
+ const handleGoogleSignIn = async () => {
+  await authClient.signIn.social({
+    provider: "google",
+    callbackURL: "/?role=member", 
+    additionalData: {
+      role: "member",
+    },
+  });
+};
 
   const onSubmit = async (e) => {
     e.preventDefault();
